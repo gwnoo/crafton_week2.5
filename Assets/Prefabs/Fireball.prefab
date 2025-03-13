@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 6090172323165510620}
   - component: {fileID: 5105128255563201485}
   - component: {fileID: 6686150030774167225}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fireball
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -147,7 +147,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -167,3 +167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 40
   lifetime: 5
+  damageLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  shooter: {fileID: 0}

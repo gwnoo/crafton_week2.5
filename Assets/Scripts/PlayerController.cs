@@ -10,14 +10,20 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     public bool isGrounded;
 
-    public GameObject fireballPrefab;  // ÆÄÀÌ¾îº¼ ÇÁ¸®ÆÕ
-    public Transform firePoint;        // ÆÄÀÌ¾îº¼ÀÌ ¹ß»çµÉ À§Ä¡ (ÇÃ·¹ÀÌ¾îÀÇ ¼ÕÀÌ³ª ¾ÕÂÊ)
+    public GameObject fireballPrefab; 
+    public Transform firePoint;     
 
-    public GameObject barrier;  // ¹è¸®¾î ¿ÀºêÁ§Æ®
-    public float barrierDuration = 2f;  // ¹è¸®¾î Áö¼Ó ½Ã°£
+    public GameObject barrier;
+    public float barrierDuration = 2f; 
 
-    private bool isBarrierActive = false;  // ¹è¸®¾î°¡ È°¼ºÈ­ µÇ¾ú´ÂÁö Ã¼Å©
-    private float barrierTimer = 0f;  // ¹è¸®¾î°¡ È°¼ºÈ­µÈ ½Ã°£
+    private bool isBarrierActive = false;  
+    private float barrierTimer = 0f; 
+
+    public float attackRange = 1.5f;  
+    public float attackCooldown = 0.5f; 
+    private float lastAttackTime = 0f;  
+    public LayerMask bulletLayer; 
+
 
     void Start()
     {
@@ -34,41 +40,85 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
         // jump
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && Input.GetKeyDown(KeyCode.W))
         {
             rb.linearVelocity = Vector2.up * jumpForce;
         }
 
 
-        // ¹è¸®¾î°¡ È°¼ºÈ­µÈ ÈÄ ½Ã°£ Ã¼Å©
         if (isBarrierActive)
         {
-            barrierTimer += Time.deltaTime; // ½Ã°£ Áõ°¡
+            barrierTimer += Time.deltaTime; 
 
-            // ¹è¸®¾î°¡ 2ÃÊ ÈÄ ºñÈ°¼ºÈ­
             if (barrierTimer >= barrierDuration)
             {
                 DeactivateBarrier();
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.E) && Time.time > lastAttackTime + attackCooldown)
+        {
+            lastAttackTime = Time.time;
+            PerformMeleeAttack();
+        }
+
     }
 
     public void ShootFireball()
     {
-        // ÆÄÀÌ¾îº¼ »ı¼º (¹ß»ç À§Ä¡¿¡¼­ »ı¼º)
         Instantiate(fireballPrefab, firePoint.position, firePoint.rotation);
     }
 
     public void ActivateBarrier()
     {
-        barrier.SetActive(true);  // ¹è¸®¾î È°¼ºÈ­
-        isBarrierActive = true;  // ¹è¸®¾î°¡ È°¼ºÈ­µÈ »óÅÂ·Î º¯°æ
-        barrierTimer = 0f;  // Å¸ÀÌ¸Ó ÃÊ±âÈ­
+        barrier.SetActive(true);  
+        isBarrierActive = true; 
+        barrierTimer = 0f; 
     }
 
     private void DeactivateBarrier()
     {
-        barrier.SetActive(false);  // ¹è¸®¾î ºñÈ°¼ºÈ­
-        isBarrierActive = false;  // ¹è¸®¾î°¡ ºñÈ°¼ºÈ­µÈ »óÅÂ·Î º¯°æ
+        barrier.SetActive(false); 
+        isBarrierActive = false;
+    }
+
+    void PerformMeleeAttack()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange, bulletLayer);
+
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.CompareTag("Bullet"))
+            {
+                Vector2 attackDirection = (hit.transform.position - transform.position).normalized;
+                Rigidbody2D bulletRb = hit.GetComponent<Rigidbody2D>();
+                bulletRb.transform.SetParent(transform);
+
+                if (bulletRb != null)
+                {
+                    // ì´ì•Œì˜ ì´ë™ ë°©í–¥ì„ ë°˜ëŒ€ë¡œ íŠ•ê²¨ë‚´ê¸°
+                    bulletRb.linearVelocity = -bulletRb.linearVelocity;
+
+                    // ìƒˆë¡œ íŠ•ê²¨ë‚¸ ì´ì•Œì˜ ì†ë„ ìœ ì§€ ë° ë°˜ëŒ€ ë°©í–¥ìœ¼ë¡œ ë°œì‚¬
+                    GameObject newBullet = Instantiate(fireballPrefab, bulletRb.transform.position, Quaternion.identity, transform);
+
+                    // ìƒˆ ì´ì•Œì— ë¬¼ë¦¬ì  ì†ë„ ë¶€ì—¬
+                    Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+                    if (newBulletRb != null)
+                    {
+                        newBulletRb.linearVelocity = bulletRb.linearVelocity;  // ê¸°ì¡´ ì´ì•Œì˜ ì†ë„ ìœ ì§€
+                    }
+
+                    // ê¸°ì¡´ ì´ì•Œ ì‚­ì œ
+                    Destroy(hit.gameObject);
+                }
+            }
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange); 
     }
 }

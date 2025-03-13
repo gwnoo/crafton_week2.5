@@ -11,7 +11,7 @@ public class PuzzleManager : MonoBehaviour
 
     void Update()
     {
-        // ≈« ≈∞∞° ¥≠∑»¿ª ∂ß
+        /*// ≈« ≈∞∞° ¥≠∑»¿ª ∂ß
         if (Input.GetKey(KeyCode.Tab))
         {
             // Canvas∏¶ »∞º∫»≠
@@ -27,7 +27,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 canvas.SetActive(false);
             }
-        }
+        }*/
     }
 
 }
