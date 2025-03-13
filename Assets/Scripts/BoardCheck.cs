@@ -21,6 +21,7 @@ public class BoardCheck : MonoBehaviour
     public int displayedTileCount = 0;
     private int[] uf = new int[49];
     private GameObject tileGenerator;
+    private GameObject player;
 
     private int[] checkNum = new int[] { 1, 2, 3, 4, 5, 7, 13, 14, 20, 21, 27, 28, 34, 35, 41, 43, 44, 45, 46, 47 };
 
@@ -35,9 +36,10 @@ public class BoardCheck : MonoBehaviour
         GameObject boardInventory = GameObject.Find("BoardInventory");
         for (int i = 0; i < 25; i++)
         {
-            boardSlot[i] = boardInventory.transform.GetChild(i).gameObject;
+            boardSlot[i] = boardInventory.transform.GetChild(i).gameObject; 
         }
         tileGenerator = GameObject.Find("TileGenerator");
+        player = GameObject.Find("Player");
     }
 
     public void Check()
@@ -166,6 +168,15 @@ public class BoardCheck : MonoBehaviour
         // 점수 계산 : 배율 정해서. 이부분은 쉽게 수정되게. 배율변수 빼기.
         displayedTileCount -= len;
         score += len * len * len;
+        if(len == 1)
+        {
+            player.GetComponent<PlayerController>().ActivateBarrier();
+        }
+        else
+        {
+            player.GetComponent<PlayerController>().ShootFireball();
+        }
+            
     }
 
     private void DestroyTile(int y, int x)

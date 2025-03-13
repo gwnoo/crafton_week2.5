@@ -7,11 +7,12 @@ TagManager:
   - Board
   - Offer
   - Spike
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 
