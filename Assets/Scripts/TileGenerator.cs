@@ -28,7 +28,7 @@ public class TileGenerator : MonoBehaviour
     {
         RerollToggle.onValueChanged.AddListener(Reroll);
         RerollCount = 3;
-        tileCount = 3;
+        tileCount = 1;
         TileGenerate(InventorySlot1);
         TileGenerate(InventorySlot2);
         TileGenerate(InventorySlot3);
@@ -46,12 +46,6 @@ public class TileGenerator : MonoBehaviour
         if (RerollCount == 0)
         {
             SoundManager.Instance.PlayForbidSound();
-
-            DeleteTile(InventorySlot1);
-            DeleteTile(InventorySlot2);
-            DeleteTile(InventorySlot3);
-
-            Generate();
         }
         else if (RerollCount == 1)
         {
@@ -59,8 +53,6 @@ public class TileGenerator : MonoBehaviour
             RerollCount--;
 
             DeleteTile(InventorySlot1);
-            DeleteTile(InventorySlot2);
-            DeleteTile(InventorySlot3);
 
             Generate();
 
@@ -72,12 +64,9 @@ public class TileGenerator : MonoBehaviour
             RerollCount--;
 
             DeleteTile(InventorySlot1);
-            DeleteTile(InventorySlot2);
-            DeleteTile(InventorySlot3);
 
             Generate();
         }
-    
     }
 
 
@@ -101,11 +90,11 @@ public class TileGenerator : MonoBehaviour
         tileCount -= 1;
     }
 
-    private void Generate()
+    public void Generate()
     {
-        tileCount = 3;
-        TileGenerate(InventorySlot1);
-        TileGenerate(InventorySlot2);
+        tileCount = 1;
+        MoveTile(InventorySlot1, InventorySlot2);
+        MoveTile(InventorySlot2, InventorySlot3);
         TileGenerate(InventorySlot3);
     }
 
@@ -185,7 +174,7 @@ public class TileGenerator : MonoBehaviour
             case 11:
                 newType = 15; // ¦«¸ð¾ç 1111
                 ChangeColor(Colors.WHITE, childList[2], childList[4], childList[5], childList[6], childList[8]);
-                ChangeColor(Colors.YELLOW, childList[1], childList[3], childList[7], childList[9]);
+                ChangeColor(Colors.BLUE, childList[1], childList[3], childList[7], childList[9]);
                 break;
             default:
                 newType = 0;
@@ -294,8 +283,6 @@ public class TileGenerator : MonoBehaviour
         tileDraggable = newTile.GetComponent<TileDraggable>();
         tileDraggable.enabled = false;
     }
-
-
 
     private void MoveTile(Transform slot1, Transform slot2)
     {
