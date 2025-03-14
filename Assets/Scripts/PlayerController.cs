@@ -5,8 +5,9 @@ using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-    private float moveSpeed = 10f;
-    private float jumpForce = 40f;
+    private float moveSpeed = 20f;
+    private Vector2 moveDirection = Vector2.right;
+    private float jumpForce = 30f;
     public Transform groundCheck;
     public LayerMask groundLayer;
 
@@ -34,7 +35,7 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0f;          
     private float lastDashTime = 0f;
     private TrailRenderer trailRenderer;
-    public int maxDashCount = 3;           // 최대 회피 가능 횟수
+    public int maxDashCount = 300;           // 최대 회피 가능 횟수
     private int currentDashCount;          // 현재 회피 가능 횟수
     public UnityEngine.UI.Image dashBar;                  // 회피 횟수를 표시할 UI (Image)
 
@@ -54,7 +55,7 @@ public class PlayerController : MonoBehaviour
         // jump check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
 
-        if (Input.GetKeyDown(KeyCode.S) && Time.time >= lastDashTime + dashCooldown && currentDashCount > 0)
+        if (Input.GetKeyDown(KeyCode.S) && Time.time >= lastDashTime + dashCooldown && currentDashCount > 0 && isGrounded)
         {
             Dash();
         }
@@ -68,6 +69,9 @@ public class PlayerController : MonoBehaviour
         {
             isDashing = false;
             trailRenderer.enabled = false;
+
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), false);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
         }
 
         // jump
@@ -99,7 +103,20 @@ public class PlayerController : MonoBehaviour
     {
         // move left and right
         float moveInput = Input.GetAxis("Horizontal");
+        if (moveInput > 0)
+        {
+            moveDirection = Vector2.right; 
+        }
+        else if (moveInput < 0)
+        {
+            moveDirection = Vector2.left; 
+        }
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+
+        if(Input.GetKey(KeyCode.S) && !isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -moveSpeed);
+        }
     }
 
     void Dash()
@@ -114,15 +131,19 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         trailRenderer.enabled = true;
 
-        float moveInput = Input.GetAxis("Horizontal");
-        if (moveInput != 0)
-        {
-            rb.linearVelocity = new Vector2(moveInput * dashSpeed, rb.linearVelocity.y);
-        }
-        else
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), true);
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), true); 
+
+        if (moveDirection == Vector2.right)
         {
             rb.linearVelocity = new Vector2(dashSpeed, rb.linearVelocity.y);
         }
+        else if (moveDirection == Vector2.left)
+        {
+            rb.linearVelocity = new Vector2(-dashSpeed, rb.linearVelocity.y);
+        }
+
+
     }
 
     private void UpdateDashUI()

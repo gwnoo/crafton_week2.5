@@ -9,6 +9,7 @@ TagManager:
   - Spike
   - Enemy
   - Bullet
+  - Ground
   layers:
   - Default
   - TransparentFX
