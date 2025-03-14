@@ -172,6 +172,10 @@ public class BoardCheck : MonoBehaviour
         {
             player.GetComponent<PlayerController>().ActivateBarrier();
         }
+        else if(len == 2)
+        {
+            player.GetComponent<PlayerController>().GetDashCount();
+        }
         else
         {
             player.GetComponent<PlayerController>().ShootFireball();
