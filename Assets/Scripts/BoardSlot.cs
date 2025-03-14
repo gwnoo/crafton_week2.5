@@ -27,7 +27,7 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
         //tile.GetComponent<RectTransform>().sizeDelta = rect.sizeDelta;
 
         int type = tile.GetComponent<TileDraggable>().tileType;
-        BoardCheck.adj[idx / 5 + 1, idx % 5 + 1] = type;
+        BoardCheck.adj[idx / 3 + 1, idx % 3 + 1] = type;
         tileGenerator.GetComponent<BoardCheck>().displayedTileCount += 1;
         tile.GetComponent<TileDraggable>().enabled = false;
 
