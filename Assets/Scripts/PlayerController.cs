@@ -39,6 +39,12 @@ public class PlayerController : MonoBehaviour
     private int currentDashCount;          // 현재 회피 가능 횟수
     public UnityEngine.UI.Image dashBar;                  // 회피 횟수를 표시할 UI (Image)
 
+    public bool isScaling = false;  // 스케일 변화 여부
+    private float scaleTime = 0f;
+    private float scaleDuration = 0.1f;
+    private float holdDuration = 0.3f;  // 배리어가 잠시 동안 유지될 시간 (초)
+    private float holdTime = 0f;
+
 
     void Start()
     {
@@ -71,7 +77,6 @@ public class PlayerController : MonoBehaviour
             trailRenderer.enabled = false;
 
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), false);
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), false);
         }
 
         // jump
@@ -81,20 +86,40 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (isBarrierActive)
-        {
-            barrierTimer += Time.deltaTime; 
-
-            if (barrierTimer >= barrierDuration)
-            {
-                DeactivateBarrier();
-            }
-        }
-
         if (Input.GetKeyDown(KeyCode.E) && Time.time > lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
-            PerformMeleeAttack();
+            StartScaleAnimation();
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+            rb.AddForce(Vector2.up * 1200f, ForceMode2D.Impulse);
+
+        }
+
+        if (isScaling)
+        {
+            // 점진적으로 스케일을 증가
+            scaleTime += Time.deltaTime / scaleDuration;  // scaleDuration 동안 스케일 변화
+            float scaleValue = Mathf.Lerp(1f, 5f, scaleTime);  // 0에서 5까지 스케일 변화
+
+            // Barrier의 스케일을 설정
+            barrier.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+
+            // 애니메이션 종료 처리
+            if (scaleTime >= 1f)
+            {
+                isScaling = false;  // 스케일 변화 완료
+                holdTime = 0f;  // 유지 시간 초기화
+            }
+        }
+        // 스케일 애니메이션이 끝난 후 배리어가 일정 시간 동안 유지되도록 처리
+        else if (holdTime < holdDuration)
+        {
+            holdTime += Time.deltaTime;  // 배리어가 유지되는 동안 시간 추적
+        }
+        else if (holdTime >= holdDuration)
+        {
+            // 일정 시간 후 Barrier를 비활성화
+            barrier.SetActive(false);
         }
 
     }
@@ -132,7 +157,6 @@ public class PlayerController : MonoBehaviour
         trailRenderer.enabled = true;
 
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), true);
-        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"), true); 
 
         if (moveDirection == Vector2.right)
         {
@@ -194,18 +218,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void ActivateBarrier()
-    {
-        barrier.SetActive(true);  
-        isBarrierActive = true; 
-        barrierTimer = 0f; 
-    }
-
-    private void DeactivateBarrier()
-    {
-        barrier.SetActive(false); 
-        isBarrierActive = false;
-    }
 
     void PerformMeleeAttack()
     {
@@ -235,8 +247,19 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        StartScaleAnimation();
     }
 
+    void StartScaleAnimation()
+    {
+        // 스케일 애니메이션 시작 시점
+        if (!isScaling)
+        {
+            barrier.SetActive(true);
+            isScaling = true;
+            scaleTime = 0f;  // 시간 초기화
+        }
+    }
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

@@ -51,7 +51,6 @@ public class EnemyController : MonoBehaviour
 
     void AttackRanged()
     {
-        Debug.Log("Attacking Player with ranged attack!");
 
         attackCooldown = attackDelay;
 
@@ -68,7 +67,7 @@ public class EnemyController : MonoBehaviour
         Vector2 direction = (player.position - attackPoint.position).normalized;
 
         // 발사된 공격에 속도 부여
-        rb.linearVelocity = direction * 40f;  // 속도 조절
+        rb.linearVelocity = direction * 100f;  // 속도 조절
     }
 
     void AttackCloseRange()

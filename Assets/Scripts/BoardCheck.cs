@@ -170,7 +170,7 @@ public class BoardCheck : MonoBehaviour
         score += len * len * len;
         if(len == 1)
         {
-            player.GetComponent<PlayerController>().ActivateBarrier();
+            
         }
         else if(len == 2)
         {

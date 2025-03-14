@@ -2,13 +2,16 @@ using UnityEngine;
 
 public class Fireball : MonoBehaviour
 {
-    public float speed = 40f;  // 파이어볼의 속도
     public float lifetime = 2f; // 파이어볼의 수명 (시간 후 삭제)
     public LayerMask damageLayer;  // 데미지를 줄 대상 레이어 (예: Player)
     public GameObject shooter;  // 발사자(적 또는 플레이어)
+    public LineRenderer lineRenderer;
 
 
     private Rigidbody2D rb;
+    private Vector2 lastPosition;
+    public Color startColor = Color.yellow;  // 궤적의 시작 색상
+    public Color endColor = Color.red;  // 궤적의 끝 색상
 
     void Start()
     {
@@ -19,6 +22,30 @@ public class Fireball : MonoBehaviour
         if (shooter == null)
         {
             shooter = transform.parent?.gameObject;
+        }
+
+        if (lineRenderer != null)
+        {
+            lineRenderer.positionCount = 0; // 라인 렌더러 초기화
+            lineRenderer.startWidth = 0; // 라인 시작 너비
+            lineRenderer.endWidth = 0.1f; // 라인 끝 너비
+
+            lineRenderer.startColor = startColor;
+            lineRenderer.endColor = endColor;
+        }
+
+        lastPosition = transform.position; // 첫 위치 설정
+    }
+
+    void Update()
+    {
+
+        // 라인 렌더러에 현재 위치를 추가
+        if (lineRenderer != null)
+        {
+            // 라인 렌더러 위치 추가
+            lineRenderer.positionCount++;
+            lineRenderer.SetPosition(lineRenderer.positionCount - 1, transform.position);
         }
     }
 

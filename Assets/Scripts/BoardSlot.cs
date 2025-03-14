@@ -10,6 +10,17 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
     private GameObject slot;
     private GameObject tileGenerator;
     public int tileType;
+    private KeyCode[] keyCodes = {
+        KeyCode.Keypad7,
+        KeyCode.Keypad8,
+        KeyCode.Keypad9,
+        KeyCode.Keypad4,
+        KeyCode.Keypad5,
+        KeyCode.Keypad6,
+        KeyCode.Keypad1,
+        KeyCode.Keypad2,
+        KeyCode.Keypad3,
+    };
 
     private void Awake()
     {
@@ -17,6 +28,31 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
         rect = GetComponent<RectTransform>();
         slot = GameObject.Find("OfferSlot1");
         tileGenerator = GameObject.Find("TileGenerator");
+    }
+
+    private void Update()
+    {
+        for (int i = 0; i < keyCodes.Length; i++)
+        {
+            if (Input.GetKeyDown(keyCodes[i]) && i == idx)
+            {
+                Debug.Log(i);
+                GameObject tile = slot.transform.GetChild(0).gameObject;
+                tile.transform.SetParent(transform);
+                tile.GetComponent<RectTransform>().position = rect.position;
+                //tile.GetComponent<RectTransform>().sizeDelta = rect.sizeDelta;
+
+                int type = tile.GetComponent<TileDraggable>().tileType;
+                BoardCheck.adj[idx / 3 + 1, idx % 3 + 1] = type;
+                tileGenerator.GetComponent<BoardCheck>().displayedTileCount += 1;
+                tile.GetComponent<TileDraggable>().enabled = false;
+
+                tileGenerator.GetComponent<TileGenerator>().MinusTileCount();
+                tileGenerator.GetComponent<BoardCheck>().Check();
+
+                SoundManager.Instance.PlayDisplaySound();
+            }
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
