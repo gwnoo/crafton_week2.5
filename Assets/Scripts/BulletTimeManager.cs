@@ -83,15 +83,20 @@ public class BulletTimeManager : MonoBehaviour
                 StartCoroutine(OriginTimeCoroutine());
             }
         }
-        else
+        /*else
         {
             slowTimeCost += Time.deltaTime * 3;
             if (slowTimeCost >= slowTimeMaxCost)
             {
                 slowTimeCost = slowTimeMaxCost;
             }
-        }
+        }*/
         timeBar.fillAmount = slowTimeCost / slowTimeMaxCost;
     }
 
+    public void GetSlowTimeCost()
+    {
+        slowTimeCost = slowTimeMaxCost;
+        timeBar.fillAmount = slowTimeCost / slowTimeMaxCost;
+    }
 }

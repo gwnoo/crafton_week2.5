@@ -22,6 +22,7 @@ public class BoardCheck : MonoBehaviour
     private int[] uf = new int[25];
     private GameObject tileGenerator;
     private GameObject player;
+    private GameObject skillGenerator;
 
     private int[] checkNum = new int[] { 1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23};
 
@@ -40,6 +41,7 @@ public class BoardCheck : MonoBehaviour
         }
         tileGenerator = GameObject.Find("TileGenerator");
         player = GameObject.Find("Player");
+        skillGenerator = GameObject.Find("SkillInventory");
     }
 
     public void Check()
@@ -168,17 +170,36 @@ public class BoardCheck : MonoBehaviour
         // 점수 계산 : 배율 정해서. 이부분은 쉽게 수정되게. 배율변수 빼기.
         displayedTileCount -= len;
         score += len * len * len;
-        if(len == 1)
+        switch(len)
         {
-            
-        }
-        else if(len == 2)
-        {
-            player.GetComponent<PlayerController>().GetDashCount();
-        }
-        else
-        {
-            player.GetComponent<PlayerController>().ShootFireball();
+            case 1:
+                player.GetComponent<PlayerController>().GetDashCount();
+                break;
+            case 2:
+                player.GetComponent<PlayerController>().GetBarrierCount();
+                break;
+            case 3:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(0);
+                break;
+            case 4:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(1);
+                break;
+            case 5:
+                GameObject bulletTimeManager = GameObject.Find("BulletTimeManager");
+                bulletTimeManager.GetComponent<BulletTimeManager>().GetSlowTimeCost();
+                break;
+            case 6:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(2);
+                break;
+            case 7:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(3);
+                break;
+            case 8:
+                break;
+            case 9:
+                break;
+            default:
+                break;
         }
             
     }

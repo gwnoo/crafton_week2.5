@@ -1,4 +1,5 @@
 using Microsoft.Unity.VisualStudio.Editor;
+using System.Diagnostics.Contracts;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -15,14 +16,13 @@ public class PlayerController : MonoBehaviour
     public bool isGrounded;
     private bool isDashing = false;
 
-    public GameObject fireballPrefab; 
+    public GameObject fireballPrefab;
+    public GameObject iceballPrefab;
     public Transform firePoint;     
 
     public GameObject barrier;
     public float barrierDuration = 2f; 
 
-    private bool isBarrierActive = false;  
-    private float barrierTimer = 0f; 
 
     private float attackRange = 2.5f;  
     private float attackCooldown = 0.5f; 
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0f;          
     private float lastDashTime = 0f;
     private TrailRenderer trailRenderer;
-    public int maxDashCount = 300;           // 최대 회피 가능 횟수
+    private int maxDashCount = 5;           // 최대 회피 가능 횟수
     private int currentDashCount;          // 현재 회피 가능 횟수
     public UnityEngine.UI.Image dashBar;                  // 회피 횟수를 표시할 UI (Image)
 
@@ -44,16 +44,24 @@ public class PlayerController : MonoBehaviour
     private float scaleDuration = 0.1f;
     private float holdDuration = 0.3f;  // 배리어가 잠시 동안 유지될 시간 (초)
     private float holdTime = 0f;
+    private int currentBarrierCount;
+    private int maxBarrierCount = 5;
+    public UnityEngine.UI.Image barrierBar;
+
+    private GameObject skillGenerator;
 
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         trailRenderer = GetComponent<TrailRenderer>();  // TrailRenderer 컴포넌트 가져오기
         trailRenderer.enabled = false;
+        skillGenerator = GameObject.Find("SkillInventory");
 
         currentDashCount = maxDashCount;
+        currentBarrierCount = maxBarrierCount;
         UpdateDashUI();
+        UpdateBarrierUI();
     }
 
     void Update()
@@ -86,13 +94,12 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(KeyCode.E) && Time.time > lastAttackTime + attackCooldown)
+        if (Input.GetKeyDown(KeyCode.E) && Time.time > lastAttackTime + attackCooldown && currentBarrierCount > 0)
         {
             lastAttackTime = Time.time;
             StartScaleAnimation();
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             rb.AddForce(Vector2.up * 1200f, ForceMode2D.Impulse);
-
         }
 
         if (isScaling)
@@ -120,6 +127,19 @@ public class PlayerController : MonoBehaviour
         {
             // 일정 시간 후 Barrier를 비활성화
             barrier.SetActive(false);
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            skillGenerator.GetComponent<SkillGenerator>().CastSkill(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            skillGenerator.GetComponent<SkillGenerator>().CastSkill(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            skillGenerator.GetComponent<SkillGenerator>().CastSkill(3);
         }
 
     }
@@ -177,12 +197,28 @@ public class PlayerController : MonoBehaviour
         dashBar.fillAmount = fillAmount;
     }
 
+    private void UpdateBarrierUI()
+    {
+        // 회피 UI 채우기 비율 계산 (남은 회피 횟수 / 최대 회피 횟수)
+        float fillAmount = (float)currentBarrierCount / maxBarrierCount;
+        barrierBar.fillAmount = fillAmount;
+    }
+
     public void GetDashCount()
     {
         if(currentDashCount < maxDashCount)
         {
             currentDashCount = maxDashCount;
             UpdateDashUI();
+        }
+    }
+
+    public void GetBarrierCount()
+    {
+        if (currentBarrierCount < maxBarrierCount)
+        {
+            currentBarrierCount = maxBarrierCount;
+            UpdateBarrierUI();
         }
     }
 
@@ -205,6 +241,26 @@ public class PlayerController : MonoBehaviour
         return closestEnemy;
     }
 
+    public void CastSkill(int skillType)
+    {
+        if (skillType == 0)
+        {
+            ShootFireball();
+        }
+        else if (skillType == 1)
+        {
+            ShootIceball();
+        }
+        else if (skillType == 2)
+        {
+            ShootFireballToAll();
+        }
+        else if (skillType == 3)
+        {
+            ShootIceballToAll();
+        }
+    }
+
     public void ShootFireball()
     {
         GameObject newBullet = Instantiate(fireballPrefab, transform.position, Quaternion.identity, transform);
@@ -214,7 +270,50 @@ public class PlayerController : MonoBehaviour
         if (newBulletRb != null)
         {
             Vector2 directionToEnemy = (FindClosestEnemy().position - transform.position).normalized;
-            newBulletRb.linearVelocity = directionToEnemy * 40f;  // 새로운 총알의 속도 설정
+            newBulletRb.linearVelocity = directionToEnemy * 100f;  // 새로운 총알의 속도 설정
+        }
+    }
+
+    public void ShootFireballToAll()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            GameObject newBullet = Instantiate(fireballPrefab, transform.position, Quaternion.identity, transform);
+            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+            if (newBulletRb != null)
+            {
+                Vector2 directionToEnemy = (enemy.transform.position - transform.position).normalized;
+                newBulletRb.linearVelocity = directionToEnemy * 100f;
+            }
+        }
+    }
+
+    public void ShootIceball()
+    {
+        GameObject newBullet = Instantiate(iceballPrefab, transform.position, Quaternion.identity, transform);
+
+        // 총알이 적을 향하도록 방향 설정
+        Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+        if (newBulletRb != null)
+        {
+            Vector2 directionToEnemy = (FindClosestEnemy().position - transform.position).normalized;
+            newBulletRb.linearVelocity = directionToEnemy * 60f;  // 새로운 총알의 속도 설정
+        }
+    }
+
+    public void ShootIceballToAll()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            GameObject newBullet = Instantiate(iceballPrefab, transform.position, Quaternion.identity, transform);
+            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+            if (newBulletRb != null)
+            {
+                Vector2 directionToEnemy = (enemy.transform.position - transform.position).normalized;
+                newBulletRb.linearVelocity = directionToEnemy * 60f;
+            }
         }
     }
 
@@ -252,6 +351,9 @@ public class PlayerController : MonoBehaviour
 
     void StartScaleAnimation()
     {
+        currentBarrierCount--;
+        UpdateBarrierUI();
+
         // 스케일 애니메이션 시작 시점
         if (!isScaling)
         {
