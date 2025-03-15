@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 6347252608346251999}
   - component: {fileID: 8217817693096450860}
   m_Layer: 7
-  m_Name: Enemy
+  m_Name: IceEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -112,7 +112,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.5471698, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.2688679, g: 0.45937973, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -203,6 +203,9 @@ MonoBehaviour:
   attackRange: 20
   closeRange: 2
   attackDelay: 1
-  projectilePrefab: {fileID: 2054138875680020457, guid: 036df73c3d5a31e44b58810e2ac545d0, type: 3}
+  FireballPrefab: {fileID: 2054138875680020457, guid: 036df73c3d5a31e44b58810e2ac545d0, type: 3}
+  IceballPrefab: {fileID: 8639810695162935785, guid: a55a4b9eb900eac469e572dbfedb957d, type: 3}
   attackPoint: {fileID: 4557272554550195598}
   player: {fileID: 0}
+  health: 10
+  enemyType: 1

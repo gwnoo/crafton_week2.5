@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
             isDashing = false;
             trailRenderer.enabled = false;
 
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), false);
+            gameObject.tag = "Player";
         }
 
         // jump
@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         trailRenderer.enabled = true;
 
-        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Bullet"), true);
+        gameObject.tag = "Barrier";
 
         if (moveDirection == Vector2.right)
         {
@@ -362,6 +362,8 @@ public class PlayerController : MonoBehaviour
             scaleTime = 0f;  // 시간 초기화
         }
     }
+
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

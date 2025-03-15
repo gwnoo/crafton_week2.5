@@ -1,8 +1,20 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int health = 100;  // 플레이어의 체력
+    public int health = 10;  // 플레이어의 체력
+    [SerializeField]
+    private TextMeshProUGUI gameOverTxt;
+    private PlayerController playerController;
+    public GameObject ice;
+
+    void Awake()
+    {
+        playerController = GetComponent<PlayerController>(); // PlayerController 컴포넌트 가져오기
+    }
 
     public void TakeDamage(int damage)
     {
@@ -13,10 +25,28 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void Freeze(float duration)
+    {
+        StartCoroutine(FreezeCoroutine(duration));
+    }
+
+    private IEnumerator FreezeCoroutine(float duration)
+    {
+        if (playerController != null)
+        {
+            playerController.enabled = false; // 플레이어 이동 비활성화
+            ice.SetActive(true); // 얼음 활성화
+
+            yield return new WaitForSeconds(duration); // 일정 시간 대기
+            playerController.enabled = true; // 플레이어 이동 활성화
+            ice.SetActive(false); // 얼음 비활성화
+        }
+    }
+
     void Die()
     {
-        // 플레이어가 죽었을 때 처리하는 코드
-        Debug.Log("Player died!");
-        // 예를 들어, 게임 오버 처리나 리스폰 등을 추가할 수 있습니다.
+        SoundManager.Instance.PlayGameOverSound();
+        gameOverTxt.gameObject.SetActive(true);
+        gameOverTxt.text = "Your Score is ";
     }
 }

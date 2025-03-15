@@ -36,7 +36,10 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
         {
             if (Input.GetKeyDown(keyCodes[i]) && i == idx)
             {
-                Debug.Log(i);
+                if(transform.childCount > 0)
+                {
+                    break;
+                }
                 GameObject tile = slot.transform.GetChild(0).gameObject;
                 tile.transform.SetParent(transform);
                 tile.GetComponent<RectTransform>().position = rect.position;
@@ -44,7 +47,6 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
 
                 int type = tile.GetComponent<TileDraggable>().tileType;
                 BoardCheck.adj[idx / 3 + 1, idx % 3 + 1] = type;
-                tileGenerator.GetComponent<BoardCheck>().displayedTileCount += 1;
                 tile.GetComponent<TileDraggable>().enabled = false;
 
                 tileGenerator.GetComponent<TileGenerator>().MinusTileCount();
@@ -57,6 +59,8 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        for (int i = 0; i < transform.childCount; i++)
+            Destroy(transform.GetChild(i).gameObject);
         GameObject tile = slot.transform.GetChild(0).gameObject;
         tile.transform.SetParent(transform);
         tile.GetComponent<RectTransform>().position = rect.position;
@@ -64,7 +68,6 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
 
         int type = tile.GetComponent<TileDraggable>().tileType;
         BoardCheck.adj[idx / 3 + 1, idx % 3 + 1] = type;
-        tileGenerator.GetComponent<BoardCheck>().displayedTileCount += 1;
         tile.GetComponent<TileDraggable>().enabled = false;
 
         tileGenerator.GetComponent<TileGenerator>().MinusTileCount();

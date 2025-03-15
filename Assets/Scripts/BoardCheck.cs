@@ -13,10 +13,7 @@ public class BoardCheck : MonoBehaviour
     [SerializeField]
     private GameObject[] boardSlot;
     [SerializeField]
-    private TextMeshProUGUI scoreTxt;
-    [SerializeField]
     private TextMeshProUGUI gameOverTxt;
-    public static int score = 0;
     public static bool gameover = false;
     public int displayedTileCount = 0;
     private int[] uf = new int[25];
@@ -32,8 +29,6 @@ public class BoardCheck : MonoBehaviour
     {
         adj = new int[5, 5] { { 0, 4, 4, 4, 0 }, { 2, 0, 0, 0, 8 }, { 2, 0, 0, 0, 8 }, { 2, 0, 0, 0, 8 }, { 0, 1, 1, 1, 0 } };
         gameover = false;
-        score = 0;
-        scoreTxt.text = "" + score;
         GameObject boardInventory = GameObject.Find("BoardInventory");
         for (int i = 0; i < 9; i++)
         {
@@ -107,18 +102,6 @@ public class BoardCheck : MonoBehaviour
             }
         }
 
-        if (displayedTileCount >= 9) // gameover
-        {
-            gameover = true;
-        }
-        if(gameover)
-        {
-            SoundManager.Instance.PlayGameOverSound();
-            gameOverTxt.gameObject.SetActive(true);
-            gameOverTxt.text = "Your Score is " + score;
-        }
-
-        scoreTxt.text = "" + score;
     }
 
     private void UfMerge(int a, int b)
@@ -168,8 +151,6 @@ public class BoardCheck : MonoBehaviour
         }
 
         // 점수 계산 : 배율 정해서. 이부분은 쉽게 수정되게. 배율변수 빼기.
-        displayedTileCount -= len;
-        score += len * len * len;
         switch(len)
         {
             case 1:

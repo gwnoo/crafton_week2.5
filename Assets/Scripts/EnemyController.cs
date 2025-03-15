@@ -7,9 +7,12 @@ public class EnemyController : MonoBehaviour
     public float attackRange = 10f; 
     public float closeRange = 2f; 
     public float attackDelay = 1f; 
-    public GameObject projectilePrefab; 
+    public GameObject FireballPrefab;
+    public GameObject IceballPrefab;
     public Transform attackPoint; 
-    public Transform player; 
+    public Transform player;
+    public int health = 10;
+    public int enemyType = 0;
 
     private float attackCooldown = 0f; 
     private bool isAttacking = false; 
@@ -59,21 +62,25 @@ public class EnemyController : MonoBehaviour
 
     void ShootProjectile()
     {
+        Vector3 gunDirection = (player.transform.position - transform.position).normalized;
+        float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+
         // 원거리 공격 발사 (예: 파이어볼)
-        GameObject projectile = Instantiate(projectilePrefab, attackPoint.position, Quaternion.identity, transform);
-        Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-
-        // 공격 방향 계산 (플레이어 방향으로 발사)
-        Vector2 direction = (player.position - attackPoint.position).normalized;
-
-        // 발사된 공격에 속도 부여
-        rb.linearVelocity = direction * 100f;  // 속도 조절
+        if(enemyType == 0)
+        {
+            GameObject projectile = Instantiate(FireballPrefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+            projectile.GetComponent<Fireball>().shooter = gameObject;
+        }
+        else if (enemyType == 1)
+        {
+            GameObject projectile = Instantiate(IceballPrefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+            projectile.GetComponent<Iceball>().shooter = gameObject;
+        }
     }
 
     void AttackCloseRange()
     {
         isAttacking = true;
-        Debug.Log("Attacking Player with close range attack!");
 
         attackCooldown = attackDelay;
 
@@ -92,7 +99,22 @@ public class EnemyController : MonoBehaviour
         isAttacking = false;
     }
 
-    
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+    void Die()
+    {
+        Destroy(gameObject);
+    }
+
+
+
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

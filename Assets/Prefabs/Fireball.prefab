@@ -11,12 +11,11 @@ GameObject:
   - component: {fileID: 5062602618752026382}
   - component: {fileID: 6601512839949502838}
   - component: {fileID: 6090172323165510620}
-  - component: {fileID: 5105128255563201485}
   - component: {fileID: 6686150030774167225}
   - component: {fileID: 6884461594124131340}
   m_Layer: 8
   m_Name: Fireball
-  m_TagString: Bullet
+  m_TagString: Fireball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,42 +117,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!58 &5105128255563201485
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054138875680020457}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.49999997
 --- !u!114 &6686150030774167225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,9 +130,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 5
-  damageLayer:
-    serializedVersion: 2
-    m_Bits: 128
   shooter: {fileID: 0}
   lineRenderer: {fileID: 6884461594124131340}
   startColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

@@ -3,26 +3,23 @@ using UnityEngine;
 public class Fireball : MonoBehaviour
 {
     public float lifetime = 2f; // 파이어볼의 수명 (시간 후 삭제)
-    public LayerMask damageLayer;  // 데미지를 줄 대상 레이어 (예: Player)
     public GameObject shooter;  // 발사자(적 또는 플레이어)
     public LineRenderer lineRenderer;
+    private float speed = 100f;
 
 
     private Rigidbody2D rb;
     private Vector2 lastPosition;
     public Color startColor = Color.yellow;  // 궤적의 시작 색상
     public Color endColor = Color.red;  // 궤적의 끝 색상
+    private Vector3 previousPosition;
+
 
     void Start()
     {
         // 일정 시간 후 파이어볼 삭제 (충돌을 감지하지 않으므로 일정 시간 후 자동 삭제)
         Destroy(gameObject, lifetime);
-
-        // 발사자 설정이 되어 있지 않다면 이 객체의 부모(발사자)로 설정
-        if (shooter == null)
-        {
-            shooter = transform.parent?.gameObject;
-        }
+        previousPosition = transform.position;
 
         if (lineRenderer != null)
         {
@@ -34,11 +31,23 @@ public class Fireball : MonoBehaviour
             lineRenderer.endColor = endColor;
         }
 
-        lastPosition = transform.position; // 첫 위치 설정
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        
+        // 총알이 이동한 현재 위치
+        Vector3 currentPosition = transform.position;
+
+        // 레이캐스트로 충돌 확인
+        CheckCollision(previousPosition, currentPosition);
+
+        // 이전 위치를 현재 위치로 갱신
+        previousPosition = currentPosition;
+
+        // 총알 이동
+        rb.linearVelocity = transform.right * speed;
 
         // 라인 렌더러에 현재 위치를 추가
         if (lineRenderer != null)
@@ -49,14 +58,40 @@ public class Fireball : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    void CheckCollision(Vector3 start, Vector3 end)
     {
-        if (collision.gameObject != shooter)
+        // 이전 위치에서 현재 위치로 레이캐스트 발사
+        RaycastHit2D hit;
+        Vector3 direction = end - start;  // 총알의 이동 방향
+
+        hit = Physics2D.Raycast(start, direction, direction.magnitude);
+        if (hit.collider != null)
         {
-            if (collision.CompareTag("Player") || collision.CompareTag("Enemy"))
+            // 충돌한 오브젝트가 있다면
+            if (hit.collider.gameObject != shooter)
             {
-                // 여기서 총알에 대한 처리를 할 수 있습니다 (예: 데미지, 효과 등)
-                Destroy(gameObject);  // 충돌한 후 총알 삭제
+                if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Enemy"))
+                {
+                    if(hit.collider.CompareTag("Player"))
+                    {
+                        hit.collider.GetComponent<PlayerHealth>().TakeDamage(10);
+                    }
+                    else if (hit.collider.CompareTag("Enemy"))
+                    {
+                        hit.collider.GetComponent<EnemyController>().TakeDamage(10);
+                    }
+                    Destroy(gameObject);
+                }
+                if (hit.collider.CompareTag("Barrier"))
+                {
+                    transform.position = hit.point;
+                    Vector3 gunDirection = (shooter.transform.position - transform.position).normalized;
+                    float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+                    Debug.Log(angle);
+                    shooter = hit.collider.gameObject;
+                }
             }
         }
     }

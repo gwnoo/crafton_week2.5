@@ -52,7 +52,6 @@ public class TileTouchable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             int idx = transform.parent.GetComponent<BoardSlot>().GetIdx();
             BoardCheck.adj[idx / 5 + 1, idx % 5 + 1] = tileType;
             tileGenerator = GameObject.Find("TileGenerator");
-            tileGenerator.GetComponent<BoardCheck>().displayedTileCount += 1;
             tileDraggable.enabled = false;
 
             tileGenerator.GetComponent<TileGenerator>().MinusTileCount();
