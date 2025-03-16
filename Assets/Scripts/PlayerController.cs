@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public bool isWall;
     private bool isDashing = false;
     private bool isWallJumping = false;
+    private bool canStickToWall = true;
 
     public GameObject fireballPrefab;
     public GameObject iceballPrefab;
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     private float dashSpeed = 50f;      
     private float wallJumpSpeed = 40f;
     private float dashDuration = 0.2f;      
-    private float wallJumpDuration = 0.1f;
+    private float wallJumpDuration = 0.2f;
     private float dashCooldown = 0.5f;  
     private float dashTime = 0f;          
     private float lastDashTime = 0f;
@@ -94,7 +95,7 @@ public class PlayerController : MonoBehaviour
 
             if(isWallJumping)
             {
-                StartCoroutine(FreeFallCoroutine(0.3f));
+                StartCoroutine(FreeFallCoroutine(0.2f));
             }
 
             gameObject.tag = "Player";
@@ -216,6 +217,7 @@ public class PlayerController : MonoBehaviour
 
         isDashing = true;
         isWallJumping = true;
+        
         trailRenderer.enabled = true;
 
         gameObject.tag = "Dash";
@@ -232,15 +234,34 @@ public class PlayerController : MonoBehaviour
         }
 
         // 벽 반대 방향으로 대쉬 방향 설정
-        Vector2 dashDirection = new Vector2(wallNormal.x, 0.75f).normalized;
+        Vector2 dashDirection = new Vector2(wallNormal.x, 1f).normalized;
 
         // 새로운 대쉬 방향으로 속도 설정
         rb.linearVelocity = dashDirection * wallJumpSpeed;
     }
+
+    private void OnCollisionBegin2D(Collision2D collision)
+    {
+        if (isWallJumping && collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            // 벽 쪽으로 힘을 가하여 벽에 붙게 함
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+            rb.AddForce(new Vector2(-collision.contacts[0].normal.x * 1f, 0), ForceMode2D.Impulse);
+        }
+    }
+
+
     private IEnumerator FreeFallCoroutine(float duration)
     {
-        // 자유낙하 상태 유지
-        yield return new WaitForSeconds(duration);
+        if (isWall)
+        {
+            yield return null;
+        } 
+        else
+        {
+            // 자유낙하 상태 유지
+            yield return new WaitForSeconds(duration);
+        }  
         // 자유낙하 상태 종료
         isWallJumping = false;
     }
@@ -391,6 +412,7 @@ public class PlayerController : MonoBehaviour
             // 새로운 대쉬 방향으로 속도 설정
             rb.linearVelocity = newDashDirection * dashSpeed;
         }
+
     }
     void PerformMeleeAttack()
     {

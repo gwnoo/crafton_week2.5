@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     public int health = 10;
     public int enemyType = 0;
     private float surpriseDelay = 0.3f;
+    public LayerMask groundLayer;
 
     private float attackCooldown = 0f; 
     private bool isAttacking = false;
@@ -22,7 +23,8 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        float distanceToPlayer = GetDistanceToPlayer();
+        Debug.Log(distanceToPlayer);
 
         attackCooldown -= Time.deltaTime;
 
@@ -60,6 +62,20 @@ public class EnemyController : MonoBehaviour
         }
 
         isSurprised = false;
+    }
+
+    float GetDistanceToPlayer()
+    {
+        Vector2 directionToPlayer = player.position - transform.position;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, directionToPlayer.magnitude, groundLayer);
+
+        if (hit.collider != null)
+        {
+            return detectionRange + 1;
+        }
+
+        // 장애물이 없는 경우 실제 거리 반환
+        return Vector2.Distance(transform.position, player.position);
     }
 
     void MoveTowardPlayer()
