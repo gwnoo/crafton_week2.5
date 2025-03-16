@@ -16,6 +16,11 @@ public class FollowPlayer : MonoBehaviour
         {
             transform.position = new Vector3(player.position.x, transform.position.y, transform.position.z);
         }
+        transform.position = new Vector3(transform.position.x, player.position.y, transform.position.z);
+        if (player.position.y < -13.68)
+        {
+            transform.position = new Vector3(transform.position.x, player.position.y, transform.position.z);
+        }
 
     }
 }

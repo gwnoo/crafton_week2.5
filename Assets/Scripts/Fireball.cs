@@ -69,7 +69,7 @@ public class Fireball : MonoBehaviour
         if (hit.collider != null)
         {
             // 충돌한 오브젝트가 있다면
-            if (hit.collider.gameObject != shooter)
+            if (hit.collider.gameObject.tag != shooter.tag)
             {
                 if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Enemy"))
                 {

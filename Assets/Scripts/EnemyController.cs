@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -13,9 +14,11 @@ public class EnemyController : MonoBehaviour
     public Transform player;
     public int health = 10;
     public int enemyType = 0;
+    private float surpriseDelay = 0.3f;
 
     private float attackCooldown = 0f; 
-    private bool isAttacking = false; 
+    private bool isAttacking = false;
+    private bool isSurprised = false;
 
     void Update()
     {
@@ -25,25 +28,38 @@ public class EnemyController : MonoBehaviour
 
         if (distanceToPlayer <= detectionRange)
         {
-            if (distanceToPlayer <= closeRange && attackCooldown <= 0f)
+            StartCoroutine(WaitAndAct(surpriseDelay, distanceToPlayer));
+        }
+    }
+
+    IEnumerator WaitAndAct(float delay, float distanceToPlayer)
+    {
+        if (!isSurprised)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+        isSurprised = true;
+
+        if (distanceToPlayer <= closeRange && attackCooldown <= 0f)
+        {
+            if (!isAttacking)
             {
-                if (!isAttacking)
-                {
-                    AttackCloseRange();
-                }
-            }
-            else if (distanceToPlayer <= attackRange && attackCooldown <= 0f)
-            {
-                if (!isAttacking)
-                {
-                    AttackRanged();
-                }
-            }
-            else if (distanceToPlayer >= attackRange)
-            {
-                MoveTowardPlayer();
+                AttackCloseRange();
             }
         }
+        else if (distanceToPlayer <= attackRange && attackCooldown <= 0f)
+        {
+            if (!isAttacking)
+            {
+                AttackRanged();
+            }
+        }
+        else if (distanceToPlayer >= attackRange)
+        {
+            MoveTowardPlayer();
+        }
+
+        isSurprised = false;
     }
 
     void MoveTowardPlayer()

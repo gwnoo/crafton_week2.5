@@ -12,6 +12,8 @@ TagManager:
   - Ground
   - Barrier
   - Fireball
+  - Dash
+  - TiltedGround
   layers:
   - Default
   - TransparentFX
