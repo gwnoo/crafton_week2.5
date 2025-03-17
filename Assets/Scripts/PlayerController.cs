@@ -1,4 +1,3 @@
-using Microsoft.Unity.VisualStudio.Editor;
 using System.Diagnostics.Contracts;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0f;          
     private float lastDashTime = 0f;
     private TrailRenderer trailRenderer;
-    private int maxDashCount = 500;           // 최대 회피 가능 횟수
+    private int maxDashCount = 3;           // 최대 회피 가능 횟수
     private int currentDashCount;          // 현재 회피 가능 횟수
     public UnityEngine.UI.Image dashBar;                  // 회피 횟수를 표시할 UI (Image)
 
@@ -52,7 +51,7 @@ public class PlayerController : MonoBehaviour
     private float holdDuration = 0.3f;  // 배리어가 잠시 동안 유지될 시간 (초)
     private float holdTime = 0f;
     private int currentBarrierCount;
-    private int maxBarrierCount = 500;
+    private int maxBarrierCount = 3;
     public UnityEngine.UI.Image barrierBar;
 
     private GameObject skillGenerator;
@@ -75,7 +74,7 @@ public class PlayerController : MonoBehaviour
     {
         // jump check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
-        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        if (Input.GetKey(KeyCode.LeftAlt) && isGrounded)
         {
             StartCoroutine(TemporaryDashLayer());
         }
@@ -406,7 +405,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        Vector3 gunDirection = (transform.position - FindClosestEnemy().position).normalized;
+        Vector3 gunDirection = (FindClosestEnemy().position - transform.position).normalized;
         float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
 
         GameObject projectile = Instantiate(iceballPrefab, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));

@@ -176,8 +176,12 @@ public class BoardCheck : MonoBehaviour
                 skillGenerator.GetComponent<SkillGenerator>().Generate(3);
                 break;
             case 8:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(2);
+                skillGenerator.GetComponent<SkillGenerator>().Generate(2);
                 break;
             case 9:
+                skillGenerator.GetComponent<SkillGenerator>().Generate(3);
+                skillGenerator.GetComponent<SkillGenerator>().Generate(3);
                 break;
             default:
                 break;

@@ -102,7 +102,7 @@ public class FollowPlayer : MonoBehaviour
     {
         if (cameraStage == 3)
         {
-            transform.position = new Vector3(-7.4f, -191f, -34.25f);
+            transform.position = new Vector3(-7.4f, -193f, -34.25f);
             cameraStage++;
             SaveProgress(cameraStage);
         }
@@ -110,7 +110,7 @@ public class FollowPlayer : MonoBehaviour
         {
             transform.position = new Vector3(player.position.x, transform.position.y, transform.position.z);
         }
-        if (player.position.y > -191f && player.position.y < -174f)
+        if (player.position.y > -193f && player.position.y < -174f)
         {
             transform.position = new Vector3(transform.position.x, player.position.y, transform.position.z);
         }

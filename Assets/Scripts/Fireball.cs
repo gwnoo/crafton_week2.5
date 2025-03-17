@@ -41,7 +41,10 @@ public class Fireball : MonoBehaviour
         Vector3 currentPosition = transform.position;
 
         // 레이캐스트로 충돌 확인
-        CheckCollision(previousPosition, currentPosition);
+        if (gameObject != null)
+        {
+            CheckCollision(previousPosition, currentPosition);
+        }
 
         // 이전 위치를 현재 위치로 갱신
         previousPosition = currentPosition;

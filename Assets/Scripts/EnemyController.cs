@@ -22,6 +22,7 @@ public class EnemyController : MonoBehaviour
     private bool isAttacking = false;
     private bool isSurprised = false;
     private GameObject bulletTimeManager;
+    public GameObject bloodEffectPrefab;
 
     private void Awake()
     {
@@ -155,6 +156,7 @@ public class EnemyController : MonoBehaviour
         {
             bulletTimeManager.GetComponent<BulletTimeManager>().OriginTime();
         }
+        Instantiate(bloodEffectPrefab, transform.position, Quaternion.identity);
         bulletTimeManager.GetComponent<BulletTimeManager>().HitStop();
         Destroy(gameObject);
     }

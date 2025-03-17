@@ -10,10 +10,12 @@ public class PlayerHealth : MonoBehaviour
     private TextMeshProUGUI gameOverTxt;
     private PlayerController playerController;
     public GameObject ice;
+    private GameObject reset;
 
     void Awake()
     {
         playerController = GetComponent<PlayerController>(); // PlayerController 컴포넌트 가져오기
+        reset = GameObject.Find("ResetButton");
     }
 
     public void TakeDamage(int damage)
@@ -46,7 +48,8 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         SoundManager.Instance.PlayGameOverSound();
-        gameOverTxt.gameObject.SetActive(true);
-        gameOverTxt.text = "Your Score is ";
+        reset.GetComponent<ResetButton>().ResetGame();
+        //gameOverTxt.gameObject.SetActive(true);
+        //gameOverTxt.text = "GameOver";
     }
 }

@@ -79,7 +79,7 @@ public class Iceball : MonoBehaviour
                     }
                     else if (hit.collider.CompareTag("Enemy"))
                     {
-                        hit.collider.GetComponent<EnemyController>().TakeDamage(10);
+                        hit.collider.GetComponent<FreezeMonster>().Freeze(2f);
                     }
                     Destroy(gameObject);
                 }

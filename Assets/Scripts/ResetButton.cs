@@ -10,6 +10,12 @@ public class ResetButton : MonoBehaviour
         new Vector3(-15.5f, -124f, 0),
         new Vector3(-25f, -191f, 0)
     }; // 각 스테이지마다 설정된 스폰 위치들
+    private GameObject bulletTimeManager;
+
+    private void Awake()
+    {
+        bulletTimeManager = GameObject.Find("BulletTimeManager");
+    }
 
     private void OnEnable()
     {
@@ -50,6 +56,10 @@ public class ResetButton : MonoBehaviour
     // 게임을 다시 시작할 때, 씬을 재시작
     public void ResetGame()
     {
+        if (Time.timeScale != 1)
+        {
+            bulletTimeManager.GetComponent<BulletTimeManager>().OriginTime();
+        }
         // 씬을 재시작 (현재 씬 다시 로드)
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
