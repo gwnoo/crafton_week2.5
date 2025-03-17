@@ -7,18 +7,29 @@ TagManager:
   - Board
   - Offer
   - Spike
+  - Enemy
+  - Bullet
+  - Ground
+  - Barrier
+  - Fireball
+  - Dash
+  - TiltedGround
+  - Cliff
+  - Portal
+  - Door
+  - LaserBeam
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Bullet
+  - Portal
+  - Dash
   - 
   - 
   - 

@@ -18,7 +18,6 @@ public class TileDestroy : MonoBehaviour
     {
         for (int i = 1; i < childList.Length; i++)
         {
-            Debug.Log("Destroy");
             childList[i].SetParent(canvas);
             childList[i].GetComponent<DestroyedTile>().enabled = true;
             childList[i].GetComponent<DestroyedTile>().StartDestroyEffect();
