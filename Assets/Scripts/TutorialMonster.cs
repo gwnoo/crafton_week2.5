@@ -1,27 +1,26 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class TutorialMonster : MonoBehaviour
 {
-    public float moveSpeed = 3f; 
-    public float detectionRange = 15f; 
-    public float attackRange = 10f; 
-    public float closeRange = 2f; 
-    public float attackDelay = 1f; 
+    public float moveSpeed = 3f;
+    public float detectionRange = 15f;
+    public float attackRange = 10f;
+    public float closeRange = 2f;
+    public float attackDelay = 1f;
     public GameObject FireballPrefab;
     public GameObject IceballPrefab;
-    public Transform attackPoint; 
+    public Transform attackPoint;
     public Transform player;
     public int health = 10;
     public int enemyType = 0;
-    public bool isTutorial = false;
     private float surpriseDelay = 0.3f;
     public LayerMask groundLayer;
+    private GameObject bulletTimeManager;
 
-    private float attackCooldown = 0f; 
+    private float attackCooldown = 0f;
     private bool isAttacking = false;
     private bool isSurprised = false;
-    private GameObject bulletTimeManager;
 
     private void Awake()
     {
@@ -80,7 +79,7 @@ public class EnemyController : MonoBehaviour
             return detectionRange + 1;
         }
 
-        // Ïû•Ïï†Î¨ºÏù¥ ÏóÜÎäî Í≤ΩÏö∞ Ïã§Ï†ú Í±∞Î¶¨ Î∞òÌôò
+        // ¿Âæ÷π∞¿Ã æ¯¥¬ ∞ÊøÏ Ω«¡¶ ∞≈∏Æ π›»Ø
         return Vector2.Distance(transform.position, player.position);
     }
 
@@ -96,10 +95,7 @@ public class EnemyController : MonoBehaviour
         attackCooldown = attackDelay;
 
         ShootProjectile();
-        if(isTutorial)
-        {
-            bulletTimeManager.GetComponent<BulletTimeManager>().SlowTime();
-        }
+        //bulletTimeManager.GetComponent<BulletTimeManager>().SlowTime();
     }
 
     void ShootProjectile()
@@ -107,8 +103,8 @@ public class EnemyController : MonoBehaviour
         Vector3 gunDirection = (player.transform.position - transform.position).normalized;
         float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
 
-        // ÏõêÍ±∞Î¶¨ Í≥µÍ≤© Î∞úÏÇ¨ (Ïòà: ÌååÏù¥Ïñ¥Î≥º)
-        if(enemyType == 0)
+        // ø¯∞≈∏Æ ∞¯∞› πﬂªÁ (øπ: ∆ƒ¿ÃæÓ∫º)
+        if (enemyType == 0)
         {
             GameObject projectile = Instantiate(FireballPrefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
             projectile.GetComponent<Fireball>().shooter = gameObject;
@@ -129,13 +125,13 @@ public class EnemyController : MonoBehaviour
         PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {
-            playerHealth.TakeDamage(10); 
+            playerHealth.TakeDamage(10);
         }
 
         Invoke("ResetAttackState", attackDelay);
     }
 
-    
+
     void ResetAttackState()
     {
         isAttacking = false;
@@ -151,21 +147,17 @@ public class EnemyController : MonoBehaviour
     }
     void Die()
     {
-        if (isTutorial)
-        {
-            bulletTimeManager.GetComponent<BulletTimeManager>().OriginTime();
-        }
-        bulletTimeManager.GetComponent<BulletTimeManager>().HitStop();
         Destroy(gameObject);
     }
+
 
 
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);  
+        Gizmos.DrawWireSphere(transform.position, attackRange);
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, closeRange);  
+        Gizmos.DrawWireSphere(transform.position, closeRange);
     }
 }

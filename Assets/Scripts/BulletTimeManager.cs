@@ -34,17 +34,48 @@ public class BulletTimeManager : MonoBehaviour
         SliderSet();
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            if (slowTimeCost < 1f) return;
-            StopAllCoroutines();
-            StartCoroutine(SlowTimeCoroutine());
+            SlowTime();
         }
         else if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            StopAllCoroutines();
-            StartCoroutine(OriginTimeCoroutine());
+            OriginTime();
         }
     }
 
+    public void SlowTime()
+    {
+        if (slowTimeCost < 1f) return;
+        StopAllCoroutines();
+        StartCoroutine(SlowTimeCoroutine());
+    }
+
+    public void OriginTime()
+    {
+        StopAllCoroutines();
+        StartCoroutine(OriginTimeCoroutine());
+    }
+
+    public void HitStop()
+    {
+        StartCoroutine(HitStopCoroutine());
+    }
+    private IEnumerator HitStopCoroutine()
+    {
+        // Time.timeScale을 0으로 설정하여 시간 정지
+        Time.timeScale = 0f;
+
+        // 잠시 멈춤
+        yield return new WaitForSecondsRealtime(0.15f);
+
+        // Time.timeScale을 1로 복원하여 시간 흐름 복구
+        if(isSlowTime) {
+            Time.timeScale = slowTimeScale;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+    }
 
     IEnumerator SlowTimeCoroutine()
     {

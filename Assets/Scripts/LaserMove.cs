@@ -19,9 +19,13 @@ public class LaserMove : MonoBehaviour
         transform.position += Vector3.right * moveSpeed * moveDirection * Time.deltaTime;
 
         // 이동 범위를 벗어나면 방향 반전
-        if (Mathf.Abs(transform.position.x - startPosition.x) >= moveRange)
+        if (transform.position.x - startPosition.x >= moveRange)
         {
-            moveDirection *= -1;
+            moveDirection = -1;
+        }
+        else if (transform.position.x - startPosition.x <= -moveRange)
+        {
+            moveDirection = 1;
         }
     }
 }

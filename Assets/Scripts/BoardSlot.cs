@@ -59,8 +59,10 @@ public class BoardSlot : MonoBehaviour, IPointerEnterHandler, IDropHandler, IPoi
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        for (int i = 0; i < transform.childCount; i++)
-            Destroy(transform.GetChild(i).gameObject);
+        if (transform.childCount > 0)
+        {
+            return;
+        }
         GameObject tile = slot.transform.GetChild(0).gameObject;
         tile.transform.SetParent(transform);
         tile.GetComponent<RectTransform>().position = rect.position;

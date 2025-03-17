@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     public bool isWall;
     private bool isDashing = false;
     private bool isWallJumping = false;
-    private bool canStickToWall = true;
 
     public GameObject fireballPrefab;
     public GameObject iceballPrefab;
@@ -76,6 +75,11 @@ public class PlayerController : MonoBehaviour
     {
         // jump check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        {
+            StartCoroutine(TemporaryDashLayer());
+        }
+
         isWall = Physics2D.OverlapCircle(wallCheck1.position, 0.2f, groundLayer) || Physics2D.OverlapCircle(wallCheck2.position, 0.2f, groundLayer);
 
         if (Input.GetKeyDown(KeyCode.S) && Time.time >= lastDashTime + dashCooldown && currentDashCount > 0 && isGrounded)
@@ -111,6 +115,10 @@ public class PlayerController : MonoBehaviour
             WallJump();
         }
 
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            PlayerPrefs.DeleteAll();
+        }
 
         if (Input.GetKeyDown(KeyCode.E) && Time.time > lastAttackTime + attackCooldown && currentBarrierCount > 0)
         {
@@ -182,6 +190,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private IEnumerator TemporaryDashLayer()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, 0.2f);
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.CompareTag("Cliff"))
+            {
+                gameObject.layer = LayerMask.NameToLayer("Dash");
+                yield return new WaitForSeconds(1f);
+                gameObject.layer = LayerMask.NameToLayer("Player");
+                break;
+            }
+        }
+    }
+
     void Dash()
     {
         lastDashTime = Time.time;
@@ -195,7 +218,7 @@ public class PlayerController : MonoBehaviour
         trailRenderer.enabled = true;
 
         gameObject.tag = "Dash";
-        
+
         if (moveDirection == Vector2.right)
         {
             rb.linearVelocity = new Vector2(dashSpeed, rb.linearVelocity.y);
@@ -307,6 +330,10 @@ public class PlayerController : MonoBehaviour
         foreach (GameObject enemy in enemies)
         {
             float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance >= 15f)
+            {
+                continue;
+            }
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -339,57 +366,72 @@ public class PlayerController : MonoBehaviour
 
     public void ShootFireball()
     {
-        GameObject newBullet = Instantiate(fireballPrefab, transform.position, Quaternion.identity, transform);
-
-        // 총알이 적을 향하도록 방향 설정
-        Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-        if (newBulletRb != null)
+        if(FindClosestEnemy() == null)
         {
-            Vector2 directionToEnemy = (FindClosestEnemy().position - transform.position).normalized;
-            newBulletRb.linearVelocity = directionToEnemy * 100f;  // 새로운 총알의 속도 설정
+            return;
         }
+        Vector3 gunDirection = (FindClosestEnemy().position - transform.position).normalized;
+        float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+
+        GameObject projectile = Instantiate(fireballPrefab, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+        projectile.GetComponent<Fireball>().shooter = gameObject;
+        
     }
 
     public void ShootFireballToAll()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if(enemies.Length == 0)
+        {
+            return;
+        }
         foreach (GameObject enemy in enemies)
         {
-            GameObject newBullet = Instantiate(fireballPrefab, transform.position, Quaternion.identity, transform);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            if (newBulletRb != null)
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance >= 15f)
             {
-                Vector2 directionToEnemy = (enemy.transform.position - transform.position).normalized;
-                newBulletRb.linearVelocity = directionToEnemy * 100f;
+                continue;
             }
+            Vector3 gunDirection = (enemy.transform.position - transform.position).normalized;
+            float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+
+            GameObject projectile = Instantiate(fireballPrefab, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+            projectile.GetComponent<Fireball>().shooter = gameObject;
         }
     }
 
     public void ShootIceball()
     {
-        GameObject newBullet = Instantiate(iceballPrefab, transform.position, Quaternion.identity, transform);
-
-        // 총알이 적을 향하도록 방향 설정
-        Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-        if (newBulletRb != null)
+        if (FindClosestEnemy() == null)
         {
-            Vector2 directionToEnemy = (FindClosestEnemy().position - transform.position).normalized;
-            newBulletRb.linearVelocity = directionToEnemy * 60f;  // 새로운 총알의 속도 설정
+            return;
         }
+        Vector3 gunDirection = (transform.position - FindClosestEnemy().position).normalized;
+        float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+
+        GameObject projectile = Instantiate(iceballPrefab, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+        projectile.GetComponent<Iceball>().shooter = gameObject;
     }
 
     public void ShootIceballToAll()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if (enemies.Length == 0)
+        {
+            return;
+        }
         foreach (GameObject enemy in enemies)
         {
-            GameObject newBullet = Instantiate(iceballPrefab, transform.position, Quaternion.identity, transform);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            if (newBulletRb != null)
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance >= 15f)
             {
-                Vector2 directionToEnemy = (enemy.transform.position - transform.position).normalized;
-                newBulletRb.linearVelocity = directionToEnemy * 60f;
+                continue;
             }
+            Vector3 gunDirection = (enemy.transform.position - transform.position).normalized;
+            float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
+
+            GameObject projectile = Instantiate(iceballPrefab, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+            projectile.GetComponent<Iceball>().shooter = gameObject;
         }
     }
 

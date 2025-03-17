@@ -89,7 +89,6 @@ public class Iceball : MonoBehaviour
                     Vector3 gunDirection = (shooter.transform.position - transform.position).normalized;
                     float angle = Mathf.Atan2(gunDirection.y, gunDirection.x) * Mathf.Rad2Deg;
                     transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-                    Debug.Log(angle);
                     shooter = hit.collider.gameObject;
                 }
             }
